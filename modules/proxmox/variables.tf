@@ -1,0 +1,3 @@
+variable "countIndex" {
+  type = string
+}
