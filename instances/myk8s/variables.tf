@@ -5,6 +5,9 @@ variable "proxmox_secrets" {
     pass = string
     insecure = bool
     debug = bool
+    ssh_host = string
+    ssh_port = number
+    ssh_bastion = string
   })
   description = "Proxmox secrets map"
   default = {
@@ -13,6 +16,9 @@ variable "proxmox_secrets" {
     pass = ""
     insecure = false
     debug = false
+    ssh_host = ""
+    ssh_port = 22
+    ssh_bastion = ""
   }
   sensitive = true
 }

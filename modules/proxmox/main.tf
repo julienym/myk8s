@@ -33,10 +33,9 @@ resource "proxmox_vm_qemu" "vms" {
   }
 
   #Cloud-init settings
-  ssh_user = "ubuntu"
+  ciuser = "ubuntu"
+  cicustom = "user=local:snippets/k8s-cloud-config.yml"
   ipconfig0 = "ip=dhcp"
-  sshkeys = file("/home/julien/.ssh/id_rsa.pub")
-
-
+  # sshkeys = file("/home/julien/.ssh/id_rsa.pub")
 }
 
