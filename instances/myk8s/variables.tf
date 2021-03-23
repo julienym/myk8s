@@ -6,6 +6,7 @@ variable "proxmox_secrets" {
     insecure = bool
     debug = bool
     ssh_host = string
+    ssh_user = string
     ssh_port = number
     ssh_bastion = string
   })
@@ -17,11 +18,18 @@ variable "proxmox_secrets" {
     insecure = false
     debug = false
     ssh_host = ""
+    ssh_user = ""
     ssh_port = 22
     ssh_bastion = ""
   }
   sensitive = true
 }
+
+variable "vmCount" {
+  type = number
+  description = "VM count"
+}
+
 
 # variable "vm_secrets" {
 #   type = object({

@@ -10,3 +10,5 @@ proxmox_vm = {
   onboot = false
   cores = 1
 }
+
+vmCount = 3

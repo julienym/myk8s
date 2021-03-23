@@ -15,7 +15,7 @@ resource "proxmox_vm_qemu" "vms" {
 
   #RAM settings
   memory = var.proxmox_vm.ram_mb
-  balloon = 1
+  balloon = 0
 
   #Disk settings
   disk {
@@ -32,10 +32,11 @@ resource "proxmox_vm_qemu" "vms" {
     bridge = var.proxmox_vm.bridge
   }
 
+  
   #Cloud-init settings
-  ciuser = "ubuntu"
-  cicustom = "user=local:snippets/k8s-cloud-config.yml"
+  #ciuser = "ubuntu"
+  cicustom = "user=local:snippets/${var.cloudInitFilePath}"
   ipconfig0 = "ip=dhcp"
-  # sshkeys = file("/home/julien/.ssh/id_rsa.pub")
+  sshkeys = file("/home/julien/.ssh/z600.pub")
 }
 
