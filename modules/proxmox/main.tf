@@ -1,42 +1,67 @@
 resource "proxmox_vm_qemu" "vms" {
-  name = "${var.proxmox_vm.name_prefix}-${var.countIndex}"
+  name = var.name
 
   #Provisionning settings
   # preprovision = true
   os_type = "cloud-init"
-  target_node = var.proxmox_vm.target_node
-  clone = var.proxmox_vm.clone
+  target_node = var.target_node
+  clone = var.clone
   full_clone = false
+  #qemu_os = "other"
 
   #CPU settings
   cpu = "kvm64"
-  cores = var.proxmox_vm.cores
+  cores = var.cores
   sockets = 1
 
   #RAM settings
-  memory = var.proxmox_vm.ram_mb
+  memory = var.ram_mb
   balloon = 0
 
   #Disk settings
   disk {
     type = "virtio"
-    size = "${var.proxmox_vm.disk_gb}G"
-    storage = var.proxmox_vm.storage
+    size = "${var.disk_gb}G"
+    storage = var.storage
     cache = "unsafe"
-    # ssd = true
+    #file = ""
+    #format = "raw"
+    #slot = 0
+    #storage_type = "lvmthin"
+    #volume = ""
   }
+ # bootdisk = "virtio0"
+ # scsihw = "lsi"
 
   #Network settings
   network {
     model = "virtio"
-    bridge = var.proxmox_vm.bridge
+    bridge = var.bridge
+    macaddr = var.macaddr == "" ? "" : var.macaddr 
+  #  queues = 0
+  #  rate = 0
   }
-
+  #searchdomain = "pmx2"
   
   #Cloud-init settings
-  #ciuser = "ubuntu"
+  ciuser = "ubuntu"
+  cipassword = "1234"
   cicustom = "user=local:snippets/${var.cloudInitFilePath}"
   ipconfig0 = "ip=dhcp"
   sshkeys = file("/home/julien/.ssh/z600.pub")
-}
+  #nameserver = "172.16.0.1"
 
+  lifecycle {
+    ignore_changes = [
+      #network[0].macaddr,
+      #network[0].queues,
+      #network[0].rate,
+      #disk[0].file,
+      #disk[0].format,
+      #disk[0].slot,
+      #disk[0].storage_type,
+   #   disk[0].volume
+      #searchdomain,
+    ]
+  }
+}

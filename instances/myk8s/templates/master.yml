@@ -5,6 +5,3 @@ package_upgrade: true
 
 packages:
   - qemu-guest-agent
-
-preserve_hostname: false
-fqdn: ${hostname}.${domain}

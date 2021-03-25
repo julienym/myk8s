@@ -1,14 +1,17 @@
-proxmox_vm = {
-  name_prefix = "testVM"
-  target_node = "pmx2"
-  bridge = "vmbr1"
-  clone = "bionic"
-  disk_gb = 85 #Must be => clone
-  ram_mb = 1024
-  cores = 1
-  storage = "SSD1"
-  onboot = false
-  cores = 1
+nodes = {
+  masters = {
+    count = 3
+    name_prefix = "k8s-master"
+    macaddr = [
+      "0e:87:80:89:2b:29",
+      "a6:ab:d8:f1:f5:0a",
+      "fa:b4:d5:a4:a4:bf"
+    ]
+  }
+  workers = {
+    count = 3
+    name_prefix = "k8s-worker"
+    ram_mb = 4096
+  }
 }
 
-vmCount = 3

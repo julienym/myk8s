@@ -1,19 +1,15 @@
 data "template_file" "cloud_init_template" {
-  count = var.vmCount 
-  template  = file("${path.module}/templates/k8s-cloud-config.yml")
+  template  = file("${path.module}/templates/master.yml")
 
   vars = {
-    hostname = "${var.proxmox_vm.name_prefix}-${count.index}"
-    domain = "loca"
+    domain = "k8s.loca"
   }
 }
 
 resource "null_resource" "cloud_init_config_files" {
-  count = var.vmCount 
-
   provisioner "file" {
-    content = data.template_file.cloud_init_template[count.index].rendered
-    destination = "/var/lib/vz/snippets/k8s-cloud-config-${count.index}.yml"
+    content = data.template_file.cloud_init_template.rendered
+    destination = "/var/lib/vz/snippets/k8s-master.yml"
 
     connection {
       type     = "ssh"
@@ -21,28 +17,33 @@ resource "null_resource" "cloud_init_config_files" {
       private_key = file("/home/julien/.ssh/z600")
       host     = var.proxmox_secrets.ssh_host
       port     = var.proxmox_secrets.ssh_port
-      #bastion_host = var.proxmox_secrets.ssh_bastion == "" ? "" : var.proxmox_secrets.ssh_bastion
-      # bastion_user = "ubuntu"
-      # bastion_private_key = file("/home/julien/.ssh/id_rsa")
     }
   }
 
-  #triggers = {
-  #  fileSHA = sha256(file("${path.root}/templates/k8s-cloud-config.yml"))
-  #}
+  triggers = {
+    fileSHA = sha256(file("${path.root}/templates/master.yml"))
+  }
 }
 
-module "proxmox" {
+module "proxmox_masters" {
   depends_on = [
     null_resource.cloud_init_config_files
   ]
   source = "../../modules/proxmox"
-  count = var.vmCount
+  count = local.masters.count
 
   providers = {
     proxmox = proxmox
   }
-  cloudInitFilePath = "k8s-cloud-config-${count.index}.yml"
-  proxmox_vm = var.proxmox_vm
-  countIndex = count.index
+  cloudInitFilePath = "k8s-master.yml"
+  name = "${local.masters.name_prefix}-${count.index}"
+  target_node = local.masters.target_node
+  bridge = local.masters.bridge
+  clone = local.masters.clone
+  disk_gb = local.masters.disk_gb
+  ram_mb = local.masters.ram_mb
+  cores = local.masters.cores
+  storage = local.masters.storage
+  onboot = local.masters.onboot
+  macaddr = local.masters.macaddr[count.index]
 }

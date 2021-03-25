@@ -22,43 +22,32 @@ variable "proxmox_secrets" {
     ssh_port = 22
     ssh_bastion = ""
   }
-  sensitive = true
 }
 
-variable "vmCount" {
-  type = number
-  description = "VM count"
+variable "nodes" {
+  description = "Flexible user variable for nodes"
 }
 
-
-# variable "vm_secrets" {
-#   type = object({
-#     private_key_path = string
-#     public_key_path = list(string)
-
-#   })
-# }
-
-# variable "proxmox_url" {
-#   type = string
-#   description = "Proxmox URL"
-#   sensitive = true
-# }
-
-# variable "proxmox_user" {
-#   type = string
-#   description = "Proxmox username"
-#   sensitive = true
-# }
-
-# variable "proxmox_pass" {
-#   type = string
-#   description = "Proxmox password"
-#   sensitive = true
-# }
-
-# variable "proxmox_insecure" {
-#     type = bool
-#     description = "Is Proxmox TLS valid?"
-#     default = false
-# }
+variable "nodes_default" {
+  type = object({
+    target_node = string
+    bridge = string
+    clone = string
+    disk_gb = number
+    ram_mb = number
+    storage = string
+    onboot = bool
+    cores = number
+  }) 
+  default = {
+    target_node = "pmx2"
+    bridge = "vmbr1"
+    clone = "bionic"
+    disk_gb = 85 #Must be => clone
+    ram_mb = 2048
+    storage = "SSD1"
+    onboot = false
+    cores = 2
+  }
+  description = "Map de valeurs par défaut pour les nodes"
+}
