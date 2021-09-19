@@ -1,10 +1,8 @@
 terraform {
   required_providers {
-    proxmox = {
-      source = "Telmate/proxmox"
-    }
     rke = {
       source = "rancher/rke"
+      version = "~> 1.2"
     }
   }
   required_version = ">= 0.13"

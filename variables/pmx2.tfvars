@@ -1,6 +1,6 @@
 nodes = {
   masters = {
-    count = 3
+    count = 1
     name_prefix = "k8s-master"
     macaddr = [
       "0e:87:80:89:2b:29",

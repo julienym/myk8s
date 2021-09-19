@@ -44,11 +44,9 @@ resource "proxmox_vm_qemu" "vms" {
   #searchdomain = "pmx2"
   
   #Cloud-init settings
-  ciuser = "ubuntu"
-  cipassword = "1234"
-  cicustom = "user=local:snippets/${var.cloudInitFilePath}"
+  #cicustom = "user=local:snippets/${var.cloudInitFilePath}"
   ipconfig0 = "ip=dhcp"
-  sshkeys = file("/home/julien/.ssh/z600.pub")
+  sshkeys = file("/home/julien/.ssh/id_rsa.pub")
   #nameserver = "172.16.0.1"
 
   lifecycle {

@@ -8,7 +8,8 @@ variable "proxmox_secrets" {
     ssh_host = string
     ssh_user = string
     ssh_port = number
-    ssh_bastion = string
+    bastion_host = string
+    bastion_user = string
   })
   description = "Proxmox secrets map"
   default = {
@@ -20,7 +21,8 @@ variable "proxmox_secrets" {
     ssh_host = ""
     ssh_user = ""
     ssh_port = 22
-    ssh_bastion = ""
+    bastion_host = ""
+    bastion_user = ""
   }
 }
 

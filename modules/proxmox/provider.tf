@@ -1,1 +1,1 @@
-provider "proxmox" {}
+# provider "proxmox" {}

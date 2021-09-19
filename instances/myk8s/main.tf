@@ -1,34 +1,36 @@
-data "template_file" "cloud_init_template" {
-  template  = file("${path.module}/templates/master.yml")
+# data "template_file" "cloud_init_template" {
+#   template  = file("${path.module}/templates/master.yml")
 
-  vars = {
-    domain = "k8s.loca"
-  }
-}
+#   vars = {
+#     domain = "k8s.loca"
+#   }
+# }
 
-resource "null_resource" "cloud_init_config_files" {
-  provisioner "file" {
-    content = data.template_file.cloud_init_template.rendered
-    destination = "/var/lib/vz/snippets/k8s-master.yml"
+# resource "null_resource" "cloud_init_config_files" {
+#   provisioner "file" {
+#     content = data.template_file.cloud_init_template.rendered
+#     destination = "/var/lib/vz/snippets/k8s-master.yml"
 
-    connection {
-      type     = "ssh"
-      user     = var.proxmox_secrets.ssh_user
-      private_key = file("/home/julien/.ssh/z600")
-      host     = var.proxmox_secrets.ssh_host
-      port     = var.proxmox_secrets.ssh_port
-    }
-  }
+#     connection {
+#       type     = "ssh"
+#       user     = var.proxmox_secrets.ssh_user
+#       private_key = file("/home/julien/.ssh/id_rsa")
+#       host     = var.proxmox_secrets.ssh_host
+#       port     = var.proxmox_secrets.ssh_port
+#       bastion_host = var.proxmox_secrets.bastion_host
+#       bastion_user = var.proxmox_secrets.bastion_user
+#     }
+#   }
 
-  triggers = {
-    fileSHA = sha256(file("${path.root}/templates/master.yml"))
-  }
-}
+#   triggers = {
+#     fileSHA = sha256(file("${path.root}/templates/master.yml"))
+#   }
+# }
 
 module "proxmox_masters" {
-  depends_on = [
-    null_resource.cloud_init_config_files
-  ]
+  # depends_on = [
+  #   null_resource.cloud_init_config_files
+  # ]
   source = "../../modules/proxmox"
   count = local.masters.count
 
@@ -46,4 +48,14 @@ module "proxmox_masters" {
   storage = local.masters.storage
   onboot = local.masters.onboot
   macaddr = local.masters.macaddr[count.index]
+}
+
+module "rke" {
+  # depends_on = [
+  #   null_resource.cloud_init_config_files
+  # ]
+  source = "../../modules/rke"
+  # count = local.masters.count
+
+  nodes = module.proxmox_masters.nodes
 }

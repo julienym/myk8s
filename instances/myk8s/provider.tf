@@ -10,3 +10,8 @@ provider "proxmox" {
         _capturelog = ""
     } : {}
 }
+
+provider "rke" {
+  debug = false
+#   log_file = "<RKE_LOG_FILE>"
+}
