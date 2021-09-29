@@ -1,3 +1,5 @@
-output "nodes" {
-  value = [ for node in proxmox_vm_qemu.vms: node.name ]
-} 
+output "proxmox_nodes" {
+  value = proxmox_vm_qemu.vms.name
+  # value = proxmox_vm_qemu.vms
+  sensitive   = true
+}

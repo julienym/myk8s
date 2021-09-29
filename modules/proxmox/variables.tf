@@ -1,6 +1,11 @@
-variable "cloudInitFilePath" {
+# variable "cloudInitFilePath" {
+#   type = string
+# }
+
+variable "snippet" {
   type = string
 }
+
 variable "name" {
   type = string
 }

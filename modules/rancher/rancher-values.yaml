@@ -1,0 +1,3 @@
+# hostname: rancher.k8s.locacloud.com
+
+tls: external

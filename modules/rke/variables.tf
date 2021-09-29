@@ -1,6 +1,9 @@
 variable "nodes" {
   # type = string
 }
+
+variable "bastion" {}
+
 # variable "name" {
 #   type = string
 # }

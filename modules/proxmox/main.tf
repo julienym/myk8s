@@ -30,7 +30,14 @@ resource "proxmox_vm_qemu" "vms" {
     #storage_type = "lvmthin"
     #volume = ""
   }
- # bootdisk = "virtio0"
+ bootdisk = "virtio0"
+ boot = "c"
+ agent = 1
+ onboot = false
+ define_connection_info = true
+ force_create = false
+ additional_wait = 30
+#  preprovision = false
  # scsihw = "lsi"
 
   #Network settings
@@ -44,9 +51,11 @@ resource "proxmox_vm_qemu" "vms" {
   #searchdomain = "pmx2"
   
   #Cloud-init settings
-  #cicustom = "user=local:snippets/${var.cloudInitFilePath}"
+  cicustom = "user=local:snippets/${reverse(split("/", var.snippet))[0]}"
+  force_recreate_on_change_of = sha256(file("${var.snippet}"))
   ipconfig0 = "ip=dhcp"
-  sshkeys = file("/home/julien/.ssh/id_rsa.pub")
+  ciuser = "ubuntu"
+  # sshkeys = file("/home/julien/.ssh/id_rsa.pub")
   #nameserver = "172.16.0.1"
 
   lifecycle {

@@ -1,3 +1,17 @@
-# output "nodes" {
-#   value = { for node in proxmox_vm_qemu.vms: name => name }
-# } 
+output "client_cert" {
+  value = rke_cluster.rancher.client_cert 
+} 
+
+output "client_key" {
+  value = rke_cluster.rancher.client_key 
+}
+
+output "ca_crt" {
+  value = rke_cluster.rancher.ca_crt 
+}
+
+
+output "kubeconfig" {
+  value = rke_cluster.rancher.kube_config_yaml
+  sensitive = true
+}

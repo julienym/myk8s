@@ -1,28 +1,40 @@
-variable "proxmox_secrets" {
+variable "proxmox" {}
+variable "proxmox_default" {
+  type = object({
+    insecure = bool
+    debug = bool
+    use_bastion = bool
+    template_location = string
+    node_name = string
+  })
+  description = "Proxmox map"
+  default = {
+    insecure = false
+    debug = false
+    use_bastion = false
+    template_location = "/var/lib/vz/snippets"
+    node_name = "pmx"
+  }
+}
+
+variable "proxmox_secrets" {}
+variable "proxmox_secrets_default" {
   type = object({
     url = string
     user = string
     pass = string
-    insecure = bool
-    debug = bool
     ssh_host = string
     ssh_user = string
     ssh_port = number
-    bastion_host = string
-    bastion_user = string
   })
   description = "Proxmox secrets map"
   default = {
     url = ""
     user = ""
     pass = ""
-    insecure = false
-    debug = false
     ssh_host = ""
     ssh_user = ""
     ssh_port = 22
-    bastion_host = ""
-    bastion_user = ""
   }
 }
 
@@ -52,4 +64,23 @@ variable "nodes_default" {
     cores = 2
   }
   description = "Map de valeurs par défaut pour les nodes"
+}
+
+variable "bastion" {}
+variable "bastion_default" {
+  type = object({
+    ssh_private_key = string
+    ssh_public_key = string
+    host = string
+    user = string
+    port = number
+  }) 
+  default = {
+    ssh_private_key = "~/.ssh/id_rsa"
+    ssh_public_key = "~/.ssh/id_rsa.pub"
+    host = ""
+    user = ""
+    port = 22
+  }
+  description = "Default values for using a ssh bastion"
 }
