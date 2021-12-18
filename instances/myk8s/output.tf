@@ -7,7 +7,11 @@
 #   value = data.template_file.cloud_init_template
 # }
 
-output "kubeconfig" {
-  value = nonsensitive(module.rke.kubeconfig)
-#   sensitive = true
+# output "kubeconfig" {
+#   value = nonsensitive(module.rke.kubeconfig)
+# #   sensitive = true
+# }
+
+output "api_url" {
+    value = module.rke.api_url
 }

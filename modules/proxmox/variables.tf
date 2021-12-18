@@ -36,3 +36,5 @@ variable "onboot" {
 variable "macaddr" {
   type = string
 }
+
+# variable "bastion" {}

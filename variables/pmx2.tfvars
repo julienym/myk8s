@@ -1,6 +1,11 @@
+
+rke_name = "rancher"
+
 nodes = {
   masters = {
-    count = 1
+    count = 3
+    cores = 2
+    ram_mb = 4069
     clone = "ubuntu18-template"
     name_prefix = "k8s-master"
     macaddr = [

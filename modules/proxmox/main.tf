@@ -36,7 +36,6 @@ resource "proxmox_vm_qemu" "vms" {
  onboot = false
  define_connection_info = true
  force_create = false
- additional_wait = 30
 #  preprovision = false
  # scsihw = "lsi"
 

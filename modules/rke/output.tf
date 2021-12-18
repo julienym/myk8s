@@ -11,7 +11,11 @@ output "ca_crt" {
 }
 
 
-output "kubeconfig" {
-  value = rke_cluster.rancher.kube_config_yaml
-  sensitive = true
+# output "kubeconfig" {
+#   value = rke_cluster.rancher.kube_config_yaml
+#   sensitive = true
+# }
+
+output "api_url" {
+  value = rke_cluster.rancher.api_server_url
 }

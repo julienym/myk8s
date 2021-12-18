@@ -55,17 +55,42 @@ module "proxmox_node_masters" {
   storage = local.masters.storage
   onboot = local.masters.onboot
   macaddr = local.masters.macaddr[count.index]
+
+  #Test
+  # bastion = local.bastion
 }
 
 module "rke" {
   source = "../../modules/rke"
 
+  name = var.rke_name
   nodes = [ for node in module.proxmox_node_masters.*.proxmox_nodes: node ]
   bastion = local.bastion
+  kubeconfig_path = "/home/julien/.kube/clusters/${var.rke_name}"
 }
 
+module "cert-manager" {
+  source = "../../modules/helm"
+  name = "cert-manager"
+  repository = "https://charts.jetstack.io"
+  namespace = "cert-manager"
+  chart = "cert-manager"
+  chart_version = "v1.6.1"
+  values = {
+    installCRDs = true
+  }
+}
 
 module "rancher" {
-  source = "../../modules/rancher"
-
+  source = "../../modules/helm"
+  name = "rancher"
+  repository = "https://releases.rancher.com/server-charts/stable"
+  namespace = "cattle-system"
+  chart = "rancher"
+  chart_version = "2.6.2"
+  values = {
+    hostname = "rancher.k8s.locacloud.com"
+    "ingress.tls.source" = "rancher"
+    bootstrapPassword = "password"
+  }
 }

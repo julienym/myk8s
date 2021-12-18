@@ -84,3 +84,7 @@ variable "bastion_default" {
   }
   description = "Default values for using a ssh bastion"
 }
+
+variable "rke_name" {
+  type = string
+}

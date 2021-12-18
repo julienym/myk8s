@@ -4,12 +4,13 @@ variable "nodes" {
 
 variable "bastion" {}
 
-# variable "name" {
-#   type = string
-# }
-# variable "target_node" {
-#   type = string
-# }
+variable "kubeconfig_path" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
 # variable "bridge" {
 #   type = string
 # }
