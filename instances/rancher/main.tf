@@ -33,7 +33,7 @@ resource "null_resource" "cloud_init_config_files" {
   }
 }
 
-module "proxmox_node_masters" {
+module "proxmox_node_rancher" {
   depends_on = [
     null_resource.cloud_init_config_files
   ]
@@ -44,9 +44,10 @@ module "proxmox_node_masters" {
     proxmox = proxmox
   }
   name = "${local.masters.name_prefix}-${count.index}"
-    
+  domain_name = var.domain_name
+  
   target_node = local.proxmox.node_name
-  snippet = "${path.module}/templates/rke-master.yml"
+  snippet = "${path.module}/templates/rancher.yml"
   bridge = local.masters.bridge
   clone = local.masters.clone
   disk_gb = local.masters.disk_gb
@@ -55,16 +56,21 @@ module "proxmox_node_masters" {
   storage = local.masters.storage
   onboot = local.masters.onboot
   macaddr = local.masters.macaddr[count.index]
-
-  #Test
-  # bastion = local.bastion
+  bastion = local.bastion
 }
 
 module "rke" {
   source = "../../modules/rke"
 
   name = var.rke_name
-  nodes = [ for node in module.proxmox_node_masters.*.proxmox_nodes: node ]
+  domain_name = var.domain_name
+  api_domain = var.api_domain
+
+  nodes = { for node in module.proxmox_node_rancher.*.proxmox_nodes: node => local.masters.roles }
+  # nodes = merge(
+  #   { for node in module.proxmox_node_masters.*.proxmox_nodes: node => local.masters.roles },
+  #   { for node in module.proxmox_node_workers.*.proxmox_nodes: node => local.workers.roles }
+  # )
   bastion = local.bastion
   kubeconfig_path = "/home/julien/.kube/clusters/${var.rke_name}"
 }
@@ -82,6 +88,9 @@ module "cert-manager" {
 }
 
 module "rancher" {
+  depends_on = [
+    module.cert-manager
+  ]
   source = "../../modules/helm"
   name = "rancher"
   repository = "https://releases.rancher.com/server-charts/stable"
@@ -89,8 +98,9 @@ module "rancher" {
   chart = "rancher"
   chart_version = "2.6.2"
   values = {
-    hostname = "rancher.k8s.locacloud.com"
+    hostname = "rancher.locacloud.com"
     "ingress.tls.source" = "rancher"
     bootstrapPassword = "password"
+    "certmanager.version" = "1.6.1"
   }
 }

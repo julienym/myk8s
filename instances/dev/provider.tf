@@ -11,17 +11,12 @@ provider "proxmox" {
     } : {}
 }
 
-provider "rke" {
-  debug = false
-#   log_file = "<RKE_LOG_FILE>"
-}
+# provider "helm" {
+#   kubernetes {
+#     host     = "https://${var.api_domain}:6443"
 
-provider "helm" {
-  kubernetes {
-    host     = "https://api.k8s.locacloud.com:6443"
-
-    client_certificate     = module.rke.client_cert 
-    client_key             = module.rke.client_key 
-    cluster_ca_certificate = module.rke.ca_crt 
-  }
-}
+#     client_certificate     = module.rke.client_cert 
+#     client_key             = module.rke.client_key 
+#     cluster_ca_certificate = module.rke.ca_crt 
+#   }
+# }

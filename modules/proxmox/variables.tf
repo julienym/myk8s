@@ -37,4 +37,7 @@ variable "macaddr" {
   type = string
 }
 
-# variable "bastion" {}
+variable "domain_name" {
+  type = string
+}
+variable "bastion" {}

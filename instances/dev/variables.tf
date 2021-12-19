@@ -52,16 +52,18 @@ variable "nodes_default" {
     storage = string
     onboot = bool
     cores = number
+    macaddr = list(string)
   }) 
   default = {
     target_node = "pmx2"
     bridge = "vmbr1"
     clone = "bionic"
-    disk_gb = 85 #Must be => clone
+    disk_gb = 85 #Must be >= clone
     ram_mb = 2048
     storage = "SSD1"
     onboot = false
     cores = 2
+    macaddr = [""]
   }
   description = "Map de valeurs par défaut pour les nodes"
 }
@@ -88,3 +90,11 @@ variable "bastion_default" {
 variable "rke_name" {
   type = string
 }
+
+variable "domain_name" {
+  type = string
+}
+
+# variable "api_domain" {
+#   type = string
+# }

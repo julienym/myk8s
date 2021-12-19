@@ -11,6 +11,16 @@ variable "kubeconfig_path" {
 variable "name" {
   type = string
 }
+
+variable "domain_name" {
+  type = string
+}
+
+
+variable "api_domain" {
+  type = string
+}
+
 # variable "bridge" {
 #   type = string
 # }

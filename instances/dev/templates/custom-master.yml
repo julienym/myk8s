@@ -1,0 +1,18 @@
+#cloud-config
+
+packages:
+ - ntp
+ - qemu-guest-agent
+ 
+runcmd:
+  - curl https://releases.rancher.com/install-docker/20.10.sh | sh
+  - docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run  rancher/rancher-agent:v2.6.2 --server https://rancher.locacloud.com --token xpk6kw5qf6hnq97tx6pt289fcdgchx82tqltcq6k6q8p55dz6fpvdp --ca-checksum affc6a2d2a7e5175345b737279dfab3d273fbae7a664b6e86434b176fa19c8eb --etcd --controlplane
+
+groups:
+  - docker
+
+users:
+  - name: ubuntu
+    groups: docker
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvanB0m751u7unkvMdDiRYrD34pp86f68k2f0g4gElkWvCF7PqkM5s7dOfltN1cyWZIm8adxZhdxhq4oHYKtMqD/JzSrmShdmJ0CaRGF5YjkcWkGygu9YlEgevP3iz4yxAMshv2rNz9GhJVlonEHorrVUovZvQBiLw7Laxu3rQOhin2engiM0NqaEMAsUyc97IrMHj7ehPrBIRuGaLH8kNVSCYgTFsZq6ujpHaLMBPAu35y88DI5kwHHXDdiT3k/ubTJJL1R5HarLhtVk2koPzT6CXHd2+/VDogzASOLYP/Ih/+pYwztutxBs+ihIidyxTvPyzNpVb5UVL9CNZt5eb julien@laptop

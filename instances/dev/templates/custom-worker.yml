@@ -6,6 +6,7 @@ packages:
  
 runcmd:
   - curl https://releases.rancher.com/install-docker/20.10.sh | sh
+  - docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run  rancher/rancher-agent:v2.6.2 --server https://rancher.locacloud.com --token xpk6kw5qf6hnq97tx6pt289fcdgchx82tqltcq6k6q8p55dz6fpvdp --ca-checksum affc6a2d2a7e5175345b737279dfab3d273fbae7a664b6e86434b176fa19c8eb --worker
 
 groups:
   - docker

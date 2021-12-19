@@ -66,8 +66,27 @@ resource "proxmox_vm_qemu" "vms" {
       #disk[0].format,
       #disk[0].slot,
       #disk[0].storage_type,
-   #   disk[0].volume
+      #disk[0].volume
       #searchdomain,
     ]
+  }
+
+
+  provisioner "remote-exec" {
+    inline = [ 
+      "cloud-init status --wait > /dev/null"
+    ]
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu" #Variable
+    private_key = file(var.bastion.ssh_private_key) #Temp
+    host     = "${var.name}.${var.domain_name}"
+    port     = 22
+    bastion_host = var.bastion.host != "" ? var.bastion.host : ""
+    bastion_user = var.bastion.host != "" ? var.bastion.user : ""
+    bastion_port = var.bastion.host != "" ? var.bastion.port : ""
+    bastion_private_key = var.bastion.host != "" ? file(var.bastion.ssh_private_key) : ""
   }
 }

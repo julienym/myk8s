@@ -3,13 +3,13 @@ resource "rke_cluster" "rancher" {
   cluster_name = var.name
   
   dynamic "nodes" {
-    for_each = var.nodes
+    for_each = nonsensitive(var.nodes)
     
     content {  
-      address = "${nonsensitive(nodes.value)}.loca"
-      node_name = "${nonsensitive(nodes.value)}.loca"
+      address = "${nodes.key}.${var.domain_name}"
+      node_name = "${nodes.key}.${var.domain_name}"
       user    = "ubuntu"
-      role    = ["controlplane", "worker", "etcd"]
+      role    = nodes.value
       ssh_key = file("/home/julien/.ssh/z600")
     }
   }
@@ -22,7 +22,7 @@ resource "rke_cluster" "rancher" {
   # }
 
   authentication {
-    sans = [ "api.k8s.locacloud.com" ]
+    sans = [ var.api_domain ]
   }
   bastion_host {
     address = var.bastion.host
@@ -36,6 +36,6 @@ resource "rke_cluster" "rancher" {
 }
 
 resource "local_file" "rancher_kubeconfig" {
-    content  = replace(rke_cluster.rancher.kube_config_yaml, "/https:.*:6443/", "https://api.k8s.locacloud.com:6443") 
+    content  = replace(rke_cluster.rancher.kube_config_yaml, "/https:.*:6443/", "https://${var.api_domain}:6443") 
     filename = var.kubeconfig_path
 }

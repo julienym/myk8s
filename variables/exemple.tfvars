@@ -1,5 +1,6 @@
 
 rke_name = "rancher"
+domain_name = "loca"
 
 nodes = {
   masters = {
@@ -13,11 +14,27 @@ nodes = {
       "a6:ab:d8:f1:f5:0a",
       "fa:b4:d5:a4:a4:bf"
     ]
+    roles = [
+      "controlplane",
+      "worker",
+      "etcd"
+    ]
   }
+  #Minimum 1 node with worker role for nginx ingress controller
   workers = {
-    count = 3
+    count = 1
+    cores = 4
+    ram_mb = 8192
+    clone = "ubuntu18-template"
     name_prefix = "k8s-worker"
-    ram_mb = 4096
+    macaddr = [
+      "26:f8:c6:70:3a:dd",
+      "dd:35:b6:65:d1:1d",
+      "29:69:d5:5a:4c:65"
+    ]
+    roles = [
+      "worker"
+    ]
   }
 }
 
