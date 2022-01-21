@@ -1,0 +1,34 @@
+#cloud-config
+
+packages:
+ - ntp
+ - qemu-guest-agent
+ - nfs-common
+ 
+runcmd:
+  - curl https://releases.rancher.com/install-docker/20.10.sh | sh
+  - systemctl enable --now iscsid
+
+
+groups:
+  - docker
+
+users:
+  - name: ubuntu
+    groups: docker
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvanB0m751u7unkvMdDiRYrD34pp86f68k2f0g4gElkWvCF7PqkM5s7dOfltN1cyWZIm8adxZhdxhq4oHYKtMqD/JzSrmShdmJ0CaRGF5YjkcWkGygu9YlEgevP3iz4yxAMshv2rNz9GhJVlonEHorrVUovZvQBiLw7Laxu3rQOhin2engiM0NqaEMAsUyc97IrMHj7ehPrBIRuGaLH8kNVSCYgTFsZq6ujpHaLMBPAu35y88DI5kwHHXDdiT3k/ubTJJL1R5HarLhtVk2koPzT6CXHd2+/VDogzASOLYP/Ih/+pYwztutxBs+ihIidyxTvPyzNpVb5UVL9CNZt5eb julien@laptop
+
+disk_setup:
+  /dev/vdb:
+    table_type: gpt
+    layout: True
+    overwrite: True
+
+fs_setup:
+  - device: /dev/vdb
+    filesystem: ext4
+    partition: 1
+
+mounts:
+  - [ /dev/vdb1, ${mount}, auto, "defaults,noexec" ]
