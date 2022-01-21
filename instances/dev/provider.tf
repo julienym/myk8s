@@ -11,6 +11,11 @@ provider "proxmox" {
     } : {}
 }
 
+provider "rke" {
+  debug = false
+#   log_file = "<RKE_LOG_FILE>"
+}
+
 # provider "helm" {
 #   kubernetes {
 #     host     = "https://${var.api_domain}:6443"

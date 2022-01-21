@@ -100,3 +100,8 @@ variable "domain_name" {
 variable "api_domain" {
   type = string
 }
+
+
+variable "rancher" {}
+
+variable "rancher_bootstrap" {}

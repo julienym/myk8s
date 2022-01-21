@@ -41,3 +41,5 @@ variable "domain_name" {
   type = string
 }
 variable "bastion" {}
+
+variable "data_disk" {}

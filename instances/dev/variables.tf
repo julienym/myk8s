@@ -53,6 +53,12 @@ variable "nodes_default" {
     onboot = bool
     cores = number
     macaddr = list(string)
+    roles = list(string)
+    data_disk = list(object({
+      size = string
+      storage = string
+      cache = string
+    }))
   }) 
   default = {
     target_node = "pmx2"
@@ -64,6 +70,8 @@ variable "nodes_default" {
     onboot = false
     cores = 2
     macaddr = [""]
+    roles = ["worker"]
+    data_disk = []
   }
   description = "Map de valeurs par défaut pour les nodes"
 }
@@ -95,6 +103,6 @@ variable "domain_name" {
   type = string
 }
 
-# variable "api_domain" {
-#   type = string
-# }
+variable "api_domain" {
+  type = string
+}

@@ -30,6 +30,17 @@ resource "proxmox_vm_qemu" "vms" {
     #storage_type = "lvmthin"
     #volume = ""
   }
+
+  dynamic "disk" {
+    for_each = var.data_disk
+
+    content {
+      type = "virtio"
+      size = disk.value.size
+      storage = disk.value.storage
+      cache = disk.value.cache
+    }
+  }
  bootdisk = "virtio0"
  boot = "c"
  agent = 1

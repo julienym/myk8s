@@ -1,6 +1,7 @@
 
 rke_name = "dev"
 domain_name = "dev"
+api_domain = "api.dev.locacloud.com"
 
 nodes = {
   masters = {
@@ -10,9 +11,13 @@ nodes = {
     bridge = "vmbr2"
     storage = "SSD1"
     clone = "ubuntu18-template"
-    name_prefix = "k8s-dev-master"
+    name_prefix = "dev-master"
     macaddr = [
       "5A:31:FF:D6:47:91"
+    ]
+    roles = [
+      "controlplane",
+      "etcd"
     ]
   }
   workers = {
@@ -22,9 +27,21 @@ nodes = {
     bridge = "vmbr2"
     storage = "SSD1"
     clone = "ubuntu18-template"
-    name_prefix = "k8s-dev-worker"
+    name_prefix = "dev-worker"
     macaddr = [
-      "02:C3:B5:CA:2D:00"
+      "02:C3:B5:CA:2D:00",
+      "02:C5:43:80:AF:1B"
+    ]
+    data_disk = [
+      {
+        mount = "/mnt/longhorn"
+        storage = "SSD2"
+        cache = "unsafe"
+        size = "50G"
+      }
+    ]
+    roles = [
+      "worker"
     ]
   }
 }

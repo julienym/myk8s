@@ -1,4 +1,4 @@
-resource "rke_cluster" "rancher" {
+resource "rke_cluster" "this" {
   
   cluster_name = var.name
   
@@ -36,6 +36,6 @@ resource "rke_cluster" "rancher" {
 }
 
 resource "local_file" "rancher_kubeconfig" {
-    content  = replace(rke_cluster.rancher.kube_config_yaml, "/https:.*:6443/", "https://${var.api_domain}:6443") 
+    content  = replace(rke_cluster.this.kube_config_yaml, "/https:.*:6443/", "https://${var.api_domain}:6443") 
     filename = var.kubeconfig_path
 }

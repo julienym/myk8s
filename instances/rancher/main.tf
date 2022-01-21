@@ -99,8 +99,9 @@ module "rancher" {
   chart_version = "2.6.2"
   values = {
     hostname = "rancher.locacloud.com"
-    "ingress.tls.source" = "rancher"
-    bootstrapPassword = "password"
+    "ingress.tls.source" = "letsEncrypt"
+    bootstrapPassword = var.rancher_bootstrap
     "certmanager.version" = "1.6.1"
+    replicas = var.rancher.replicas
   }
 }

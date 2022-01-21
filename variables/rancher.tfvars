@@ -3,13 +3,17 @@ rke_name = "rancher"
 domain_name = "rancher"
 api_domain = "api.rancher.locacloud.com"
 
+rancher = {
+  replicas = 1
+}
+
 nodes = {
   masters = {
-    count = 3
+    count = 1
     cores = 2
     ram_mb = 4069
     clone = "ubuntu18-template"
-    name_prefix = "k8s-master"
+    name_prefix = "rancher-master"
     macaddr = [
       "0e:87:80:89:2b:29",
       "a6:ab:d8:f1:f5:0a",
