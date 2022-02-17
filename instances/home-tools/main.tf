@@ -21,10 +21,10 @@ resource "null_resource" "cloud_init_config_files" {
       private_key = file(local.proxmox.ssh_private_key)
       host     = local.proxmox_secrets.ssh_host
       port     = local.proxmox_secrets.ssh_port
-      bastion_host = local.bastion.host != "" ? local.bastion.host : ""
-      bastion_user = local.bastion.host != "" ? local.bastion.user : ""
-      bastion_port = local.bastion.host != "" ? local.bastion.port : ""
-      bastion_private_key = local.bastion.host != "" ? file(local.bastion.ssh_private_key) : ""
+      bastion_host = local.bastion.host != "" ? local.bastion.host : null
+      bastion_user = local.bastion.host != "" ? local.bastion.user : null
+      bastion_port = local.bastion.host != "" ? local.bastion.port : null
+      bastion_private_key = local.bastion.host != "" ? file(local.bastion.ssh_private_key) : null
     }
   }
 
@@ -47,6 +47,7 @@ module "proxmox_node_rancher" {
   domain_name = var.domain_name
   
   target_node = local.proxmox.node_name
+  agent = "0"
   snippet = "${path.module}/templates/rancher.yml"
   bridge = local.masters.bridge
   clone = local.masters.clone
@@ -57,23 +58,24 @@ module "proxmox_node_rancher" {
   onboot = local.masters.onboot
   macaddr = local.masters.macaddr[count.index]
   bastion = local.bastion
+  data_disk = local.masters.data_disk
 }
 
-# module "rke" {
-#   source = "../../modules/rke"
+module "rke" {
+  source = "../../modules/rke"
 
-#   name = var.rke_name
-#   domain_name = var.domain_name
-#   api_domain = var.api_domain
+  name = var.rke_name
+  domain_name = var.domain_name
+  api_domain = var.api_domain
 
-#   nodes = { for node in module.proxmox_node_rancher.*.proxmox_nodes: node => local.masters.roles }
-#   # nodes = merge(
-#   #   { for node in module.proxmox_node_masters.*.proxmox_nodes: node => local.masters.roles },
-#   #   { for node in module.proxmox_node_workers.*.proxmox_nodes: node => local.workers.roles }
-#   # )
-#   bastion = local.bastion
-#   kubeconfig_path = "/home/julien/.kube/clusters/${var.rke_name}"
-# }
+  nodes = { for node in module.proxmox_node_rancher.*.proxmox_nodes: node => local.masters.roles }
+  # nodes = merge(
+  #   { for node in module.proxmox_node_masters.*.proxmox_nodes: node => local.masters.roles },
+  #   { for node in module.proxmox_node_workers.*.proxmox_nodes: node => local.workers.roles }
+  # )
+  bastion = local.bastion
+  kubeconfig_path = "/home/julien/.kube/clusters/${var.rke_name}"
+}
 
 # module "cert-manager" {
 #   source = "../../modules/helm"
@@ -96,10 +98,10 @@ module "proxmox_node_rancher" {
 #   repository = "https://releases.rancher.com/server-charts/stable"
 #   namespace = "cattle-system"
 #   chart = "rancher"
-#   chart_version = "2.6.2"
+#   chart_version = "2.5.12"
 #   values = {
-#     hostname = "rancher.locacloud.com"
-#     "ingress.tls.source" = "letsEncrypt"
+#     hostname = "rancher.tools.home"
+#     "ingress.tls.source" = "rancher"
 #     bootstrapPassword = var.rancher_bootstrap
 #     "certmanager.version" = "1.6.1"
 #     replicas = var.rancher.replicas

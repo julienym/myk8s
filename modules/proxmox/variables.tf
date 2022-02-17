@@ -4,6 +4,8 @@
 
 variable "snippet" {
   type = string
+  default = ""
+  description = "Snippet location"
 }
 
 variable "name" {
@@ -17,6 +19,13 @@ variable "bridge" {
 }
 variable "clone" {
   type = string
+  default = null
+  description = "VM Clone template name"
+}
+variable "iso" {
+  type = string
+  default = null
+  description = "ISO file path on the hypervisor"
 }
 variable "disk_gb" {
   type = number
@@ -35,11 +44,24 @@ variable "onboot" {
 }
 variable "macaddr" {
   type = string
+  default = ""
 }
 
 variable "domain_name" {
   type = string
 }
-variable "bastion" {}
+variable "bastion" {
+  type = map(string)
+  default = {
+    host = ""
+    user = ""
+    port = ""
+  }
+}
 
 variable "data_disk" {}
+
+variable "agent" {
+  type = string
+  default = "1"
+}

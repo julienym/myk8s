@@ -1,0 +1,32 @@
+apiVersion: v1
+baseDomain: local
+metadata:
+  name: okd
+
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: 1
+
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: 1
+
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14 
+    hostPrefix: 23 
+  machineNetwork:
+  - cidr: 192.168.10.0/24
+  networkType: OpenShiftSDN 
+  serviceNetwork: 
+  - 172.30.0.0/16
+
+platform:
+  none: {}
+
+fips: false
+
+pullSecret: '{"auths":{"fake":{"auth": "bar"}}}' 
+sshKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD1nYeJPRhiNigisrcE4GpyiYZl09Mh/AQRz/QCuzB37cLLAoA7J4pctDCax16wXuIzCFavYH4oE+qF0K1Kk/KzmX6dYkt73sQzdNb8jx1lWnJrZs4E2r7DcPm+EzLtggKhr4wVm3IuhnO2dSkEEGl6HI75lmuqOA8+aGz2gf5mhxj3x9L95b1p49dvVNx29AmHoC6qU68gi1TO44uEAbHTJZv8Ex4XsuunnsFJ1GLh2nOxLxNCiMTOoiH1foxUBb9HQS9uzJWvUwVSdcB2UYzNJq32G0De8PD8P2+WdxmHAfzI5DohLm0d9cGIc9GdXvMAxrZxUa5LqwUj6Lg3yW+hniYaHNSQksok5ZLckfBumhzxyOfg44utzM4wkyf2D0yvN2BgKPcZ7xV9flMoUjc1HE9UNdnKf2Q28sXr1IZi70CTHAy7qSC0RCNqKSdGdOqsFv580qRzaeQApEqxJIRjnxUooDX2RfMMW4KhuQK6ezKBKKq1RvA7s2SrRoCIVaU= julien@x1
