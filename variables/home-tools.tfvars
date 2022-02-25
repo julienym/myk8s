@@ -22,7 +22,7 @@ nodes = {
     roles = [
       "controlplane",
       "etcd",
-      "worker"
+      # "worker"
     ]
     data_disk = []
   }
@@ -34,16 +34,16 @@ nodes = {
     storage = "raid5"
     clone = "ubuntu-focal-template"
     name_prefix = "tools-worker"
-    # macaddr = [
-    #   "02:C3:B5:CA:2D:00",
-    #   "02:C5:43:80:AF:1B"
-    # ]
+    macaddr = [
+      "02:84:53:FD:BB:B2",
+      # "02:C5:43:80:AF:1B"
+    ]
     data_disk = [
       {
         mount = "/mnt/longhorn"
         storage = "raid5"
         cache = "unsafe"
-        size = "200G"
+        size = 200
       }
     ]
     roles = [

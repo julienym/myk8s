@@ -21,7 +21,7 @@ resource "proxmox_vm_qemu" "vms" {
   #Disk settings
   disk {
     type = "virtio"
-    size = "${var.disk_gb * 1024}M"
+    size = "${var.disk_gb * 1024 - 820}M"
     storage = var.storage
     cache = "unsafe"
     #file = ""
@@ -36,7 +36,7 @@ resource "proxmox_vm_qemu" "vms" {
 
     content {
       type = "virtio"
-      size = "${disk.value.size * 1024}M"
+      size = "${disk.value.size * 1024 - 820}M"
       storage = disk.value.storage
       cache = disk.value.cache
     }
@@ -84,21 +84,21 @@ resource "proxmox_vm_qemu" "vms" {
   }
 
 
-  # provisioner "remote-exec" {
-  #   inline = [ 
-  #     "cloud-init status --wait > /dev/null"
-  #   ]
-  # }
+  provisioner "remote-exec" {
+    inline = [ 
+      "cloud-init status --wait > /dev/null"
+    ]
+  }
 
-  # connection {
-  #   type     = "ssh"
-  #   user     = "ubuntu" #Variable
-  #   private_key = file(var.bastion.ssh_private_key) #Temp
-  #   host     = "${var.name}.${var.domain_name}"
-  #   port     = 22
-  #   bastion_host = var.bastion.host != "" ? var.bastion.host : null
-  #   bastion_user = var.bastion.host != "" ? var.bastion.user : null
-  #   bastion_port = var.bastion.host != "" ? var.bastion.port : null
-  #   bastion_private_key = var.bastion.host != "" ? file(var.bastion.ssh_private_key) : ""
-  # }
+  connection {
+    type     = "ssh"
+    user     = "ubuntu" #Variable
+    private_key = file(var.bastion.ssh_private_key) #Temp
+    host     = "${var.name}.${var.domain_name}"
+    port     = 22
+    bastion_host = var.bastion.host != "" ? var.bastion.host : null
+    bastion_user = var.bastion.host != "" ? var.bastion.user : null
+    bastion_port = var.bastion.host != "" ? var.bastion.port : null
+    bastion_private_key = var.bastion.host != "" ? file(var.bastion.ssh_private_key) : ""
+  }
 }

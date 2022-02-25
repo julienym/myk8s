@@ -105,3 +105,9 @@ variable "api_domain" {
 variable "rancher" {}
 
 variable "rancher_bootstrap" {}
+
+variable "harbor_admin_password" {}
+
+variable "harbor_storage_encryption" {}
+
+variable "harbor_db_passwd" {}

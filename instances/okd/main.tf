@@ -42,6 +42,7 @@ resource "null_resource" "openshift_install" {
   ]
   provisioner "local-exec" {
     command = <<-EOT
+      mkdir -p ./install_dir
       cp -f ./install-config.yaml ./install_dir/install-config.yaml
       ./ocpdownloads/openshift-install create manifests --dir=./install_dir
       ./ocpdownloads/openshift-install create ignition-configs --dir=./install_dir       
@@ -65,136 +66,113 @@ resource "null_resource" "openshift_install" {
 # #   value =  data.external.ign_file_hack
 # # }
 
-# resource "local_file" "installer_bu" {
-#   depends_on = [
-#     data.external.ign_file_hack
-#   ]
-#   for_each = toset(["bootstrap"]) #, "master", "worker"])
+resource "local_file" "installer_bu" {
+  depends_on = [
+    null_resource.openshift_install
+  ]
+  for_each = toset(["bootstrap"]) #, "master", "worker"])
 
-#   content = templatefile("${path.module}/templates/installer_template.bu",
-#     {
-#       block_device = "/dev/vda",
-#       # ca_certificate = tostring(file("${path.module}/pfsense.crt")),
-#       ignition_config_file = "${each.value}.ign" #tostring(base64decode(data.external.ign_file_hack["${each.value}"].result["base64_encoded"]))
-#     }
-#   )
-#   filename = "${path.module}/install_dir/${each.key}.bu"
+  content = templatefile("${path.module}/templates/installer_template.bu",
+    {
+      block_device = "/dev/vda",
+      # ca_certificate = tostring(file("${path.module}/pfsense.crt")),
+      ignition_config_file = "${each.value}.ign" #tostring(base64decode(data.external.ign_file_hack["${each.value}"].result["base64_encoded"]))
+    }
+  )
+  filename = "${path.module}/install_dir/${each.key}.bu"
   
-#   # lifecycle {
-#   #   ignore_changes = [
-#   #     content
-#   #   ]
-#   # }
-# }
+  # lifecycle {
+  #   ignore_changes = [
+  #     content
+  #   ]
+  # }
+}
 
-# resource "null_resource" "bu_2_ign" {
-#   for_each = local_file.installer_bu
+resource "null_resource" "bu_2_ign" {
+  for_each = local_file.installer_bu
 
-#   provisioner "local-exec" {
-#     command = "docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign quay.io/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign"
-#   }
-# }
+  provisioner "local-exec" {
+    command = "docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign quay.io/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign"
+  }
+}
 
-# # resource "null_resource" "validate_ign" {
-# #   depends_on = [
-# #     null_resource.bu_2_ign
-# #   ]
-# #   for_each = local_file.installer_bu
+resource "null_resource" "iso_prep" {
+  depends_on = [
+    null_resource.bu_2_ign
+  ]
+  for_each = local_file.installer_bu
 
-# #   provisioner "local-exec" {
-# #     command = "docker run -i --rm quay.io/coreos/ignition-validate:release - < ${path.module}/install_dir/${trimsuffix(basename(each.value.filename), ".bu")}.ign"
-# #   }
-# # }
+  provisioner "local-exec" {
+    command = <<-EOT
+      docker run --rm -v $(pwd)/install_dir:/ign -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 \
+        iso ignition embed -f -i /ign/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign -o ${trimsuffix(basename(each.value.filename), ".bu")}.iso \
+        fedora-coreos-34.20211031.3.0-live.x86_64.iso
+      docker run --rm -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 iso kargs modify \
+        -a coreos.inst.install_dev=/dev/vda \
+        -a coreos.inst.platform_id=qemu \
+        ${trimsuffix(basename(each.value.filename), ".bu")}.iso
+    EOT 
+  }
+  # -a coreos.live.rootfs_url=https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/35.20220116.3.0/x86_64/fedora-coreos-35.20220116.3.0-live-rootfs.x86_64.img \
 
-# resource "null_resource" "iso_prep" {
-#   depends_on = [
-#     null_resource.bu_2_ign
-#   ]
-#   for_each = local_file.installer_bu
+  # triggers = {
+  #   filemd5 = filemd5("${path.module}/install_dir/${each.value}")
+  # }
+}
 
-#   provisioner "local-exec" {
-#     command = <<-EOT
-#       docker run --rm -v $(pwd)/install_dir:/ign -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 \
-#         iso ignition embed -f -i /ign/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign -o ${trimsuffix(basename(each.value.filename), ".bu")}.iso \
-#         fedora-coreos-34.20211031.3.0-live.x86_64.iso
-#       docker run --rm -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 iso kargs modify \
-#         -a coreos.inst.install_dev=/dev/vda \
-#         ${trimsuffix(basename(each.value.filename), ".bu")}.iso
-#     EOT 
-#   }
-#   # -a coreos.live.rootfs_url=https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/35.20220116.3.0/x86_64/fedora-coreos-35.20220116.3.0-live-rootfs.x86_64.img \
+#On destroy this file is not deleted on the host!
+resource "null_resource" "upload_isos" {
+  depends_on = [
+    null_resource.iso_prep
+  ]
+  for_each = local_file.installer_bu
 
-#   # triggers = {
-#   #   filemd5 = filemd5("${path.module}/install_dir/${each.value}")
-#   # }
-# }
+  provisioner "file" {
+    source      = "${path.module}/ocpdownloads/${trimsuffix(basename(each.value.filename), ".bu")}.iso"
+    destination = "/var/lib/vz/template/iso/${trimsuffix(basename(each.value.filename), ".bu")}.iso"
+  }
 
-# #On destroy this file is not deleted on the host!
-# resource "null_resource" "upload_isos" {
-#   depends_on = [
-#     null_resource.iso_prep
-#   ]
-#   for_each = local_file.installer_bu
+  connection {
+    type     = "ssh"
+    user     = local.proxmox_secrets.ssh_user
+    private_key = file(local.proxmox.ssh_private_key)
+    host     = local.proxmox_secrets.ssh_host
+    port     = local.proxmox_secrets.ssh_port
+  }
 
-#   provisioner "file" {
-#     source      = "${path.module}/ocpdownloads/${trimsuffix(basename(each.value.filename), ".bu")}.iso"
-#     destination = "/var/lib/vz/template/iso/${trimsuffix(basename(each.value.filename), ".bu")}.iso"
-#   }
+  # triggers = {
+  #   filemd5 = filemd5("${path.module}/install_dir/${each.value}")
+  # }
+}
 
-#   connection {
-#     type     = "ssh"
-#     user     = local.proxmox_secrets.ssh_user
-#     private_key = file(local.proxmox.ssh_private_key)
-#     host     = local.proxmox_secrets.ssh_host
-#     port     = local.proxmox_secrets.ssh_port
-#   }
+module "okd_node_bootstrap" {
+  depends_on = [
+    null_resource.upload_isos
+  ]
+  source = "../../modules/proxmox"
+  count = 1
 
-#   # triggers = {
-#   #   filemd5 = filemd5("${path.module}/install_dir/${each.value}")
-#   # }
-# }
-
-# # # # resource "null_resource" "build_openshift_install" {
-# # # #   provisioner "local-exec" {
-# # # #     command = <<-EOT
-# # # #       cd openshift-installer
-# # # #       docker build -t openshift-installer .
-# # # #     EOT 
-# # # #   }
-
-# # # #   triggers = {
-# # # #     filemd5 = filemd5("${path.module}/openshift-installer/Dockerfile")
-# # # #   }
-# # # # }
-
-# module "okd_node_bootstrap" {
-#   depends_on = [
-#     null_resource.upload_isos
-#   ]
-#   source = "../../modules/proxmox"
-#   count = 1
-
-#   providers = {
-#     proxmox = proxmox
-#   }
-#   name = "okd-bootstrap"
-#   domain_name = var.domain_name
+  providers = {
+    proxmox = proxmox
+  }
+  name = "okd-bootstrap"
+  domain_name = var.domain_name
   
-#   target_node = local.proxmox.node_name
-#   # snippet = "${path.module}/templates/dev.yml"
-#   bridge = local.masters.bridge
-#   # clone = local.masters.clone
-#   iso = "local:iso/bootstrap.iso"
-#   agent = "0" #TO DO
-#   disk_gb = local.masters.disk_gb
-#   ram_mb = local.masters.ram_mb
-#   cores = local.masters.cores
-#   storage = local.masters.storage
-#   onboot = local.masters.onboot
-#   macaddr = "4E:A4:1B:51:42:34"
-#   bastion = local.bastion
-#   data_disk = local.masters.data_disk
-# }
+  target_node = local.proxmox.node_name
+  # snippet = "${path.module}/templates/dev.yml"
+  bridge = local.masters.bridge
+  # clone = local.masters.clone
+  iso = "local:iso/bootstrap.iso"
+  agent = "0" #TO DO
+  disk_gb = local.masters.disk_gb
+  ram_mb = local.masters.ram_mb
+  cores = local.masters.cores
+  storage = local.masters.storage
+  onboot = local.masters.onboot
+  macaddr = "4E:A4:1B:51:42:34"
+  bastion = local.bastion
+  data_disk = local.masters.data_disk
+}
 
 # # module "proxmox_node_masters" {
 # #   depends_on = [

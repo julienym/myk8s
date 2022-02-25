@@ -25,3 +25,11 @@ provider "helm" {
     cluster_ca_certificate = module.rke.ca_crt 
   }
 }
+
+provider "kubernetes" {
+  host     = "https://${var.api_domain}:6443"
+
+  client_certificate     = module.rke.client_cert 
+  client_key             = module.rke.client_key 
+  cluster_ca_certificate = module.rke.ca_crt 
+}
