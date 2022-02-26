@@ -111,3 +111,5 @@ variable "harbor_admin_password" {}
 variable "harbor_storage_encryption" {}
 
 variable "harbor_db_passwd" {}
+
+variable "github_token" {}

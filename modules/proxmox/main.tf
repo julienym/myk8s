@@ -84,11 +84,11 @@ resource "proxmox_vm_qemu" "vms" {
   }
 
 
-  provisioner "remote-exec" {
-    inline = [ 
-      "cloud-init status --wait > /dev/null"
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [ 
+  #     "cloud-init status --wait > /dev/null"
+  #   ]
+  # }
 
   connection {
     type     = "ssh"

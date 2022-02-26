@@ -42,4 +42,4 @@ ignition:
   security:
     tls:
       certificate_authorities:
-        - source: tftp://192.168.10.1/pfsense.crt
+        - local: ${ca_cert}

@@ -32,3 +32,8 @@ systemd:
 
         [Install]
         RequiredBy=default.target
+ignition:
+  security:
+    tls:
+      certificate_authorities:
+        - local: ${ca_cert}

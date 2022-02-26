@@ -188,6 +188,8 @@ module "harbor" {
     # "registry.credentials.password"
     "chartmuseum.enabled" = false
     "trivy.enabled" = true
+    "trivy.gitHubToken" = var.github_token
+    "trivy.resources.limits.memory" = "2Gi"
     "notary.enabled" = false
     "database.internal.password" = var.harbor_db_passwd
   }

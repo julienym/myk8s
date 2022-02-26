@@ -72,11 +72,13 @@ resource "local_file" "installer_bu" {
   ]
   for_each = toset(["bootstrap"]) #, "master", "worker"])
 
-  content = templatefile("${path.module}/templates/installer_template.bu",
+  content = templatefile("${path.module}/templates/installer_woproxy.bu",
+  # content = templatefile("${path.module}/templates/installer_template.bu",
     {
       block_device = "/dev/vda",
       # ca_certificate = tostring(file("${path.module}/pfsense.crt")),
       ignition_config_file = "${each.value}.ign" #tostring(base64decode(data.external.ign_file_hack["${each.value}"].result["base64_encoded"]))
+      ca_cert = "pfsense.crt"
     }
   )
   filename = "${path.module}/install_dir/${each.key}.bu"
@@ -92,7 +94,10 @@ resource "null_resource" "bu_2_ign" {
   for_each = local_file.installer_bu
 
   provisioner "local-exec" {
-    command = "docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign quay.io/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign"
+    command = <<-EOT
+      cp pfsense.crt install_dir/
+      docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign quay.io/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign
+    EOT
   }
 }
 
