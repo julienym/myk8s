@@ -96,7 +96,7 @@ resource "null_resource" "bu_2_ign" {
   provisioner "local-exec" {
     command = <<-EOT
       cp pfsense.crt install_dir/
-      docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign quay.io/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign
+      docker run -i --rm -v $(pwd)/install_dir:/ign -w /ign harbor.tools.home/quay/coreos/butane:release -s --files-dir . -p ${basename(each.value.filename)} > ${path.module}/install_dir/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign
     EOT
   }
 }
@@ -109,10 +109,10 @@ resource "null_resource" "iso_prep" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      docker run --rm -v $(pwd)/install_dir:/ign -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 \
+      docker run --rm -v $(pwd)/install_dir:/ign -v $(pwd)/ocpdownloads:/iso -w /iso harbor.tools.home/quay/coreos/coreos-installer:v0.10.1 \
         iso ignition embed -f -i /ign/installer-${trimsuffix(basename(each.value.filename), ".bu")}.ign -o ${trimsuffix(basename(each.value.filename), ".bu")}.iso \
         fedora-coreos-34.20211031.3.0-live.x86_64.iso
-      docker run --rm -v $(pwd)/ocpdownloads:/iso -w /iso quay.io/coreos/coreos-installer:v0.10.1 iso kargs modify \
+      docker run --rm -v $(pwd)/ocpdownloads:/iso -w /iso harbor.tools.home/quay/coreos/coreos-installer:v0.10.1 iso kargs modify \
         -a coreos.inst.install_dev=/dev/vda \
         -a coreos.inst.platform_id=qemu \
         ${trimsuffix(basename(each.value.filename), ".bu")}.iso

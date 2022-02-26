@@ -73,7 +73,7 @@ additionalTrustBundle: |
   w4nlOUleSEKwfDrbFE8dHTkPeiHK
   -----END CERTIFICATE-----
 
-# imageContentSources:
-# - mirrors:
-#   - harbor.tools.home/proxy
-#   source: quay.io
+imageContentSources:
+- mirrors:
+  - harbor.tools.home/quay/openshift
+  source: quay.io/openshift
