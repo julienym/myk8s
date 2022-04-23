@@ -1,0 +1,43 @@
+image:
+  # repository: "harbor.tools.home/docker/homeassistant/home-assistant"
+  # repository: "ghcr.io/home-assistant/home-assistant"
+  repository: "harbor.tools.home/github/home-assistant/home-assistant"
+  tag: "stable"
+config:
+  configuration: |-
+    http:
+      server_host: 0.0.0.0
+      ip_ban_enabled: false
+      # login_attempts_threshold: 5
+      use_x_forwarded_for: true
+      trusted_proxies:
+        # Pod CIDR
+        - 10.42.0.0/16
+        # Node CIDR
+        - 192.168.11.0/24
+        - ::1
+# - 0.0.0.0/0
+# - 127.0.0.1
+# - localhost
+# persistence:
+#   config:
+#     enabled: true
+#     type: configMap
+#     mountPath: /config
+ingress:
+  enabled: true
+  hosts:
+  - host: "hass.tools.home"
+    paths:
+    - path: "/"
+  tls:
+  - secretName: "hass-tls"
+    hosts: 
+    - "hass.tools.home"
+  annotations:
+    # kubernetes.io/ingress.class: "nginx"
+    nginx.org/websocket-services: home-assistant-hass
+    cert-manager.io/cluster-issuer: tools-ca
+    # nginx.ingress.kubernetes.io/websocket-services: home-assistant-hass
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"

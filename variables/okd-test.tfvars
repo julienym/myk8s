@@ -1,24 +1,24 @@
 
 rke_name = "dev"
-domain_name = "dev"
+domain_name = "okd.local"
 api_domain = "api.dev.locacloud.com"
 
 nodes = {
+  bootstrap = {
+    cores = 2
+    ram_mb = 4069
+    bridge = "vmbr1"
+    storage = "raid5"
+    name_prefix = "okd-bootstrap"
+    macaddr = "4E:A4:1B:51:42:34"
+  }
   masters = {
     count = 1
     cores = 2
     ram_mb = 4069
     bridge = "vmbr1"
     storage = "raid5"
-    clone = "ubuntu-focal-template"
     name_prefix = "okd-master"
-    macaddr = [
-      "4E:A4:1B:51:42:34"
-    ]
-    roles = [
-      "controlplane",
-      "etcd"
-    ]
   }
   workers = {
     count = 1

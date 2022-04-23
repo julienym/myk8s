@@ -1,0 +1,45 @@
+pvc:
+  mysql:
+    size: 1Gi
+    mount: /var/lib/mysql
+  config:
+    size: 100Mi
+    mount: /config
+  customautoload:
+    size: 100Mi
+    mount: /home/Shinobi/libs/customAutoLoad
+  videos:
+    size: 10Gi
+    mount: /home/Shinobi/videos
+  plugins:
+    size: 1Gi
+    mount: /home/Shinobi/plugins
+  streams:
+    size: 1Gi
+    mount: /dev/shm/streams
+
+image:
+  repository: harbor.tools.home/docker/shinobisystems/shinobi
+  tag: dev
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: tools-ca
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+  hosts:
+    - host: shino.tools.home
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+   - secretName: shinobi-tls
+     hosts:
+       - shino.tools.home
+
+service:
+  type: ClusterIP
+  port: 8080

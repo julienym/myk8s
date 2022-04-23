@@ -160,52 +160,58 @@ module "okd_node_bootstrap" {
   providers = {
     proxmox = proxmox
   }
-  name = "okd-bootstrap"
+  name = "${local.bootstrap.name_prefix}"
   domain_name = var.domain_name
+  ssh_user = "core"
   
   target_node = local.proxmox.node_name
   # snippet = "${path.module}/templates/dev.yml"
-  bridge = local.masters.bridge
+  bridge = local.bootstrap.bridge
   # clone = local.masters.clone
   iso = "local:iso/bootstrap.iso"
   agent = "0" #TO DO
-  disk_gb = local.masters.disk_gb
-  ram_mb = local.masters.ram_mb
-  cores = local.masters.cores
-  storage = local.masters.storage
-  onboot = local.masters.onboot
-  macaddr = "4E:A4:1B:51:42:34"
+  disk_gb = local.bootstrap.disk_gb
+  ram_mb = local.bootstrap.ram_mb
+  cores = local.bootstrap.cores
+  storage = local.bootstrap.storage
+  onboot = local.bootstrap.onboot
+  macaddr = local.bootstrap.macaddr
   bastion = local.bastion
-  data_disk = local.masters.data_disk
+  data_disk = local.bootstrap.data_disk
+
+  provision_verification = var.okd_node_verification
 }
 
-# # module "proxmox_node_masters" {
-# #   depends_on = [
-# #     module.proxmox_node_bootstrap
-# #   ]
-# #   source = "../../modules/proxmox"
-# #   count = local.masters.count
+# module "okd_node_masters" {
+#   depends_on = [
+#     module.okd_node_bootstrap
+#   ]
+#   source = "../../modules/proxmox"
+#   count = local.masters.count
 
-# #   providers = {
-# #     proxmox = proxmox
-# #   }
-# #   name = "${local.masters.name_prefix}-${count.index}"
-# #   domain_name = var.domain_name
+#   providers = {
+#     proxmox = proxmox
+#   }
+#   name = "${local.masters.name_prefix}-${count.index}"
+#   domain_name = var.domain_name
   
-# #   target_node = local.proxmox.node_name
-# #   # snippet = "${path.module}/templates/dev.yml"
-# #   bridge = local.masters.bridge
-# #   # clone = local.masters.clone
-# #   iso = "okd_master.iso"
-# #   disk_gb = local.masters.disk_gb
-# #   ram_mb = local.masters.ram_mb
-# #   cores = local.masters.cores
-# #   storage = local.masters.storage
-# #   onboot = local.masters.onboot
-# #   macaddr = local.masters.macaddr[count.index]
-# #   # bastion = local.bastion
-# #   data_disk = local.masters.data_disk
-# # }
+#   target_node = local.proxmox.node_name
+#   # snippet = "${path.module}/templates/dev.yml"
+#   bridge = local.masters.bridge
+#   # clone = local.masters.clone
+#   iso = "local:iso/master.iso"
+#   agent = "0" #TO DO
+#   disk_gb = local.masters.disk_gb
+#   ram_mb = local.masters.ram_mb
+#   cores = local.masters.cores
+#   storage = local.masters.storage
+#   onboot = local.masters.onboot
+#   macaddr = local.masters.macaddr[count.index]
+#   bastion = local.bastion
+#   data_disk = local.masters.data_disk
+
+#   provision_verification = var.okd_node_verification
+# }
 
 # # module "proxmox_node_workers" {
 # #   depends_on = [

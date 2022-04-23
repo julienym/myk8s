@@ -41,6 +41,7 @@ variable "storage" {
 }
 variable "onboot" {
   type = bool
+  default = false
 }
 variable "macaddr" {
   type = string
@@ -64,4 +65,14 @@ variable "data_disk" {}
 variable "agent" {
   type = string
   default = "1"
+}
+
+variable "provision_verification" {
+  type = string
+  default = "cloud-init status --wait > /dev/null"
+}
+
+variable "ssh_user" {
+  type = string
+  default = "ubuntu"
 }

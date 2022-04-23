@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "hass.fullname" . }}-config
+  labels:
+{{ include "hass.labels" . | indent 4 }}
+data:
+  configuration.yaml: |-
+    {{- .Values.config.configuration | nindent 4}}

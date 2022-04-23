@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hass.fullname" . }}
+  labels:
+{{ include "hass.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hass.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "hass.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if .Values.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          #Should be a loop
+            - name: {{ .Values.container.ports.hass.name }}
+              containerPort: {{ .Values.container.ports.hass.port }}
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: {{ .Values.container.ports.hass.port }}
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 15
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: {{ .Values.container.ports.hass.port }}
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          volumeMounts:
+            - name: hass-conf
+              mountPath: /config/configuration.yaml
+              subPath: configuration.yaml
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: hass-conf
+          configMap:
+            name: {{ include "hass.fullname" . }}-config
+            items:
+            - key: configuration.yaml
+              path: configuration.yaml
+      # - name: hass-data
+      # {{- if .Values.persistence.enabled }}
+      #   persistentVolumeClaim:
+      #     claimName: {{ include "hass.fullname" . }}-pvc
+      # {{- else }}
+      #   emptyDir: {}
+      # {{- end -}}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

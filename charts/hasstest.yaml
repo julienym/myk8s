@@ -1,0 +1,18 @@
+# image:
+#   repository: "ghcr.io/homeassistant/home-assistant"
+#   tag: "2022.3.2"
+ingress:
+  main:
+    enabled: true
+    annotations:
+      nginx.org/websocket-services: home-assistant
+      cert-manager.io/cluster-issuer: tools-ca
+    hosts:
+    - host: hass.tools.home
+      paths:
+        - path: /
+    tls:
+    - secretName: "hass-tls"
+      hosts: 
+      - "hass.tools.home"
+      

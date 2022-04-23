@@ -6,6 +6,8 @@ resource "helm_release" "this" {
   create_namespace = true
   namespace = var.namespace
   
+  values = try([file(var.values_file)], null)
+
   dynamic "set" {
     for_each = var.values
 

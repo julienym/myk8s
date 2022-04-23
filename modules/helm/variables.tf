@@ -4,6 +4,7 @@ variable "name" {
 
 variable "repository" {
   type = string
+  default = null
 }
 
 variable "chart" {
@@ -12,9 +13,17 @@ variable "chart" {
 
 variable "chart_version" {
   type = string
+  default = null
 }
 
-variable "values" {}
+variable "values" {
+  default = {}
+}
+
+variable "values_file" {
+  type = string
+  default = ""
+}
 
 variable "namespace" {
   type = string

@@ -114,3 +114,8 @@ variable "okd_required_files" {
 variable "docker_images" {
   type = list(string)
 }
+
+variable "okd_node_verification" {
+  type = string
+  default = "ip a"
+}

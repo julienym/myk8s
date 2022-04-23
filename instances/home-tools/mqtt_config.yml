@@ -1,0 +1,45 @@
+mqtt:
+  host: mqtt-eclipse-mosquitto
+
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 4
+
+ffmpeg:
+  #MJPEG
+  input_args: -avoid_negative_ts make_zero -fflags nobuffer -flags low_delay -strict experimental -fflags +genpts+discardcorrupt -use_wallclock_as_timestamps 1
+  #UDP
+  # input_args: -avoid_negative_ts make_zero -fflags +genpts+discardcorrupt -rtsp_transport udp -stimeout 5000000 -use_wallclock_as_timestamps 1
+  #BLUE IRIS
+  # input_args: -avoid_negative_ts make_zero -flags low_delay -strict experimental -fflags +genpts+discardcorrupt -rtsp_transport udp -stimeout 5000000 -use_wallclock_as_timestamps 1
+  # input_args: -avoid_negative_ts make_zero -fflags nobuffer -flags low_delay -strict experimental -fflags +genpts+discardcorrupt -rw_timeout 5000000 -use_wallclock_as_timestamps 1 -f live_flv
+  output_args:
+    record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c:v libx264 -an
+    rtmp: -c:v libx264 -an -f flv
+
+cameras:
+%{ for cam, address in icams }
+  ${cam}:
+    ffmpeg:
+      inputs:
+        - path: rtsp://${address}:554/img/media.sav?channel=2 #stream
+                rtsp://icam-west1.home:554/img/media.sav?channel=1
+          roles:
+            - detect
+            - rtmp
+        # - path: rtsp://${address}:554/img/media.sav?channel=2 #record
+        #   roles:
+        #     - record
+    detect:
+      width: 640
+      height: 480
+      fps: 5
+    # record:
+    #   enabled: True
+    snapshots:
+      enabled: True
+    live:
+      height: 320
+      quality: 31
+%{ endfor ~}

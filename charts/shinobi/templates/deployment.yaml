@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shinobi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: shinobi
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.service: shinobi
+    spec:
+      containers:
+        - env:
+            - name: PLUGIN_KEYS
+              value: '{}'
+            - name: SSL_ENABLED
+              value: "false"
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: shinobi
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            {{- range $pvc, $info := .Values.pvc }}
+            - mountPath: {{ $info.mount }}
+              name: vol-{{ $pvc }}
+            {{- end }}
+      restartPolicy: Always
+      volumes:
+        {{- range $pvc, $info := .Values.pvc }}
+        - name: vol-{{ $pvc }}
+          persistentVolumeClaim:
+            claimName: shinobi-{{ $pvc }}
+        {{- end }}

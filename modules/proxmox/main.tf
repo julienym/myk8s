@@ -45,7 +45,7 @@ resource "proxmox_vm_qemu" "vms" {
   # boot = "cd"
   boot        = "order=virtio0;ide2"
   agent = var.agent
-  onboot = false
+  onboot = var.onboot
   define_connection_info = true
   tablet = false
   force_create = false
@@ -84,15 +84,15 @@ resource "proxmox_vm_qemu" "vms" {
   }
 
 
-  # provisioner "remote-exec" {
-  #   inline = [ 
-  #     "cloud-init status --wait > /dev/null"
-  #   ]
-  # }
+  provisioner "remote-exec" {
+    inline = [ 
+      "${var.provision_verification}"
+    ]
+  }
 
   connection {
     type     = "ssh"
-    user     = "ubuntu" #Variable
+    user     = var.ssh_user
     private_key = file(var.bastion.ssh_private_key) #Temp
     host     = "${var.name}.${var.domain_name}"
     port     = 22

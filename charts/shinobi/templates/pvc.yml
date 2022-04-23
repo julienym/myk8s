@@ -1,0 +1,13 @@
+{{- range $pvc, $info := .Values.pvc }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shinobi-{{ $pvc }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ $info.size }}
+---
+{{- end }}
